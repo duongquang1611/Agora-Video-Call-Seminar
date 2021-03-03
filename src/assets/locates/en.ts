@@ -16,7 +16,7 @@ export default {
         home: 'Home',
         notification: 'Notification',
         setting: 'Setting',
-        agora:'Agora'
+        agora: 'Agora',
     },
     alert: {
         button: {

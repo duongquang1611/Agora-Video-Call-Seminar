@@ -3,8 +3,14 @@ import { Dimensions, Platform, ScrollView, StyleSheet, View } from 'react-native
 import StyledText from 'components/base/StyledText';
 import { StyledButton, StyledInput } from 'components/base';
 import AuthenticateService from 'utilities/authenticate/AuthenticateService';
-import requestCameraAndAudioPermission from 'components/base/Permission'
-import RtcEngine, { ChannelProfile, ClientRole, RtcLocalView, RtcRemoteView, VideoRenderMode } from 'react-native-agora';
+import requestCameraAndAudioPermission from 'components/base/Permission';
+import RtcEngine, {
+    ChannelProfile,
+    ClientRole,
+    RtcLocalView,
+    RtcRemoteView,
+    VideoRenderMode,
+} from 'react-native-agora';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { onChange } from 'react-native-reanimated';
 import Video from './Video';
@@ -21,10 +27,11 @@ interface AgoraState {
     peerIds: number[];
 }
 
-let agoraId = "d62d96fc554a4972b4c3ed2979470ca6"
-let appSecret = '2e3cd383f35c469189bced13db5d496e'
-let channelName = "HeroMiTest1101"
-let tempToken = "006d62d96fc554a4972b4c3ed2979470ca6IADd+JrQ8c4hBtogrXibdxFb8pNss/HhuNh65e5sPgB8+oO+/koAAAAAEACyc3BidBT9XwEAAQBzFP1f"
+const agoraId = 'd62d96fc554a4972b4c3ed2979470ca6';
+const appSecret = '2e3cd383f35c469189bced13db5d496e';
+const channelName = 'HeroMiTest1101';
+const tempToken =
+    '006d62d96fc554a4972b4c3ed2979470ca6IADd+JrQ8c4hBtogrXibdxFb8pNss/HhuNh65e5sPgB8+oO+/koAAAAAEACyc3BidBT9XwEAAQBzFP1f';
 
 const AgoraView2: React.FunctionComponent = () => {
     // const [agoraState, setAgoraState] = React.useState<AgoraState>({
@@ -78,7 +85,6 @@ const AgoraView2: React.FunctionComponent = () => {
     //             peerIds: peerIds.filter((id) => id !== uid),
     //         });
     //     });
-
 
     //     engine.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
     //         console.log('JoinChannelSuccess', channel, uid, elapsed);
@@ -204,7 +210,7 @@ const styles = StyleSheet.create({
     fullView: {
         width: dimensions.width,
         height: dimensions.height / 2,
-        marginVertical: 20
+        marginVertical: 20,
     },
     remoteContainer: {
         width: '100%',
@@ -222,4 +228,4 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         color: '#0093E9',
     },
-})
+});

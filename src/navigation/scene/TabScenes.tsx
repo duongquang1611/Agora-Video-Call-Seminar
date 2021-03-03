@@ -68,7 +68,10 @@ const MainTabContainer = () => {
         },
     ];
     return (
-        <MainTab.Navigator tabBar={(props: BottomTabBarProps) => <StyledTabBar {...props} />} initialRouteName={TAB_NAVIGATION_ROOT.AGORA_ROUTE.ROOT}>
+        <MainTab.Navigator
+            tabBar={(props: BottomTabBarProps) => <StyledTabBar {...props} />}
+            initialRouteName={TAB_NAVIGATION_ROOT.AGORA_ROUTE.ROOT}
+        >
             {ArrayTabs.map((item, index) => (
                 <MainTab.Screen key={`${index}`} options={{ ...item }} {...item} />
             ))}

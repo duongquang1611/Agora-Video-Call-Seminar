@@ -15,7 +15,6 @@ interface AgoraState {
     token: string;
     channelName: string;
     peerIds: number[];
-    joinSucceed: boolean;
 }
 
 const agoraId = 'd62d96fc554a4972b4c3ed2979470ca6';
@@ -29,28 +28,31 @@ const AgoraView = () => {
         token: tempToken,
         channelName,
         peerIds: [],
-        joinSucceed: false,
     });
-    let engine = new RtcEngine();
+    const AgoraEngine = useRef(new RtcEngine());
     const [optionsCall, setOptionsCall] = React.useState<any>({
         enableVideo: true, // true: (Default) Re-enable the local video. enableLocalVideo
         muteAllRemoteAudio: false, // true: Stop receiving all remote audio streams. muteAllRemoteAudioStreams
         muteLocalAudio: false, // true: Stop sending the local audio stream. muteLocalAudioStream
     });
     const { enableVideo, muteAllRemoteAudio, muteLocalAudio } = optionsCall;
-    const { joinSucceed, peerIds } = agoraState;
+    const { peerIds } = agoraState;
+    const [joinSucceed, setJoinSucceed] = useState(false);
     const init = async () => {
-        engine = await RtcEngine.create(agoraId);
-        engine.enableVideo();
-        engine.addListener('Warning', (warn) => {
+        AgoraEngine.current = await RtcEngine.create(agoraId);
+        AgoraEngine.current.enableVideo();
+        AgoraEngine.current.addListener('Warning', (warn) => {
             // console.log('Warning', warn);
         });
-        engine.addListener('Error', (err) => {
+        AgoraEngine.current.addListener('Error', (err) => {
             console.log('Error', err);
         });
-        engine.addListener('JoinChannelSuccess', onJoinChannelSuccess);
-        engine.addListener('UserOffline', onUserOffline);
-        engine.addListener('UserJoined', onUserJoined);
+        AgoraEngine.current.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
+            console.log('JoinChannelSuccess', channel, uid, elapsed);
+            setJoinSucceed(true);
+        });
+        AgoraEngine.current.addListener('UserOffline', onUserOffline);
+        AgoraEngine.current.addListener('UserJoined', onUserJoined);
     };
     useEffect(() => {
         if (Platform.OS === 'android') {
@@ -60,7 +62,7 @@ const AgoraView = () => {
         }
         init();
         return () => {
-            engine.destroy();
+            AgoraEngine.current.destroy();
         };
     }, []);
     const onUserOffline = (uid: number, reason: any) => {
@@ -79,32 +81,26 @@ const AgoraView = () => {
             });
         }
     };
-    const onJoinChannelSuccess = (channel: string, uid: number, elapsed: any) => {
-        console.log('JoinChannelSuccess', channel, uid, elapsed);
-        setAgoraState({
-            ...agoraState,
-            joinSucceed: true,
-        });
-    };
     const startCall = async () => {
         console.log('start agora', agoraState);
-        const res = await engine.joinChannel(agoraState.token, agoraState.channelName, null, 0);
+        const res = await AgoraEngine.current.joinChannel(agoraState.token, agoraState.channelName, null, 0);
     };
     const endCall = async () => {
-        await engine.leaveChannel();
-        setAgoraState({ ...agoraState, peerIds: [], joinSucceed: false });
+        await AgoraEngine.current.leaveChannel();
+        setAgoraState({ ...agoraState, peerIds: [] });
+        setJoinSucceed(false);
     };
 
     const toggleLocalVideo = async () => {
-        await engine.enableLocalVideo(!enableVideo);
+        await AgoraEngine.current.enableLocalVideo(!enableVideo);
         setOptionsCall({ ...optionsCall, enableVideo: !enableVideo });
     };
     const toggleRemoteAudio = async () => {
-        await engine.muteAllRemoteAudioStreams(!muteAllRemoteAudio);
+        await AgoraEngine.current.muteAllRemoteAudioStreams(!muteAllRemoteAudio);
         setOptionsCall({ ...optionsCall, muteAllRemoteAudio: !muteAllRemoteAudio });
     };
     const toggleLocalAudio = async () => {
-        await engine.muteLocalAudioStream(!muteLocalAudio);
+        await AgoraEngine.current.muteLocalAudioStream(!muteLocalAudio);
         setOptionsCall({ ...optionsCall, muteLocalAudio: !muteLocalAudio });
     };
     const renderVideos = () => {
@@ -166,7 +162,7 @@ const AgoraView = () => {
         );
     };
     const switchCamera = () => {
-        engine.switchCamera();
+        AgoraEngine.current.switchCamera();
     };
     const onChangeText = (id: string, data: string) => {
         console.log(data, id);

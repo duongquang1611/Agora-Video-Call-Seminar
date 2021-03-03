@@ -25,5 +25,5 @@ export {
     ProgressiveImage,
     StyledIndicator,
     StyledListViewSelected,
-    Permission
+    Permission,
 };

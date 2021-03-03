@@ -33,6 +33,7 @@
         "hash-object": "^0.1.7",
         "i18next": "^19.8.4",
         "react": "16.13.1",
+        "react-hook-form": "^6.15.4",
         "react-i18next": "^11.7.4",
         "react-native": "0.63.4",
         "react-native-actionsheet": "^2.4.2",

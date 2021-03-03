@@ -2,7 +2,7 @@
 import Images from 'assets/images';
 import { StyledButton, StyledIcon, StyledInput } from 'components/base';
 import requestCameraAndAudioPermission from 'components/base/Permission';
-import React, { useEffect, useRef, useState } from 'react';
+import * as React from 'react';
 import { Dimensions, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import RtcEngine, { RtcLocalView, RtcRemoteView, VideoRenderMode } from 'react-native-agora';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,10 +12,11 @@ const dimensions = {
     height: Dimensions.get('window').height,
 };
 interface AgoraState {
+    appId: string;
     token: string;
     channelName: string;
-    peerIds: number[];
     joinSucceed: boolean;
+    peerIds: number[];
 }
 
 const agoraId = 'd62d96fc554a4972b4c3ed2979470ca6';
@@ -24,79 +25,111 @@ const channelName = 'test_100';
 const tempToken =
     '006d62d96fc554a4972b4c3ed2979470ca6IADPqa1Q7Eb6dzHUAg1mnTztLnAtyJ6FLiM5yKkR43AgRS2MCloAAAAAEAAEa9nrGNNAYAEAAQAY00Bg';
 
-const AgoraView = () => {
-    const [agoraState, setAgoraState] = useState<AgoraState>({
+const AgoraView: React.FunctionComponent = () => {
+    const [agoraState, setAgoraState] = React.useState<AgoraState>({
+        appId: agoraId,
         token: tempToken,
         channelName,
-        peerIds: [],
         joinSucceed: false,
+        peerIds: [],
     });
-    let engine = new RtcEngine();
     const [optionsCall, setOptionsCall] = React.useState<any>({
         enableVideo: true, // true: (Default) Re-enable the local video. enableLocalVideo
         muteAllRemoteAudio: false, // true: Stop receiving all remote audio streams. muteAllRemoteAudioStreams
         muteLocalAudio: false, // true: Stop sending the local audio stream. muteLocalAudioStream
     });
+    let engine: RtcEngine = new RtcEngine();
     const { enableVideo, muteAllRemoteAudio, muteLocalAudio } = optionsCall;
-    const { joinSucceed, peerIds } = agoraState;
-    const init = async () => {
-        engine = await RtcEngine.create(agoraId);
-        engine.enableVideo();
+    const initAgora = async () => {
+        const { appId } = agoraState;
+        engine = await RtcEngine.create(appId);
+        // Enable the video module.
+        await engine.enableVideo();
+        // await engine.enableLocalVideo(enableVideo);
+        await engine.enableLocalAudio(!muteLocalAudio);
+        await engine.muteAllRemoteAudioStreams(muteAllRemoteAudio);
+        // Enable the local video preview.
+        // await engine.startPreview();
+        // Set the channel profile as live streaming.
+        // await engine.setChannelProfile(ChannelProfile.LiveBroadcasting)
+        // Set the user role as host.
+        // await engine.setClientRole(ClientRole.Broadcaster)
+    };
+
+    React.useEffect(() => {
         engine.addListener('Warning', (warn) => {
             // console.log('Warning', warn);
         });
+
         engine.addListener('Error', (err) => {
             console.log('Error', err);
         });
-        engine.addListener('JoinChannelSuccess', onJoinChannelSuccess);
-        engine.addListener('UserOffline', onUserOffline);
-        engine.addListener('UserJoined', onUserJoined);
-    };
-    useEffect(() => {
+
+        engine.addListener('UserJoined', (uid, elapsed) => {
+            const { peerIds } = agoraState;
+            console.log({ peerIds, uid, elapsed });
+            // If new user
+            if (peerIds.indexOf(uid) === -1) {
+                setAgoraState({
+                    // Add peer ID to state array
+                    ...agoraState,
+                    peerIds: [...peerIds, uid],
+                });
+            }
+        });
+
+        engine.addListener('UserOffline', (uid, reason) => {
+            agoraState.peerIds.length > 0 && console.log('UserOffline', uid, reason);
+            const { peerIds } = agoraState;
+            agoraState.peerIds.length > 0 &&
+                setAgoraState({
+                    // Remove peer ID from state array
+                    ...agoraState,
+                    peerIds: peerIds.filter((id) => id !== uid),
+                });
+        });
+
+        engine.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
+            console.log({ agoraState });
+
+            console.log('JoinChannelSuccess', channel, uid, elapsed);
+            setAgoraState({
+                ...agoraState,
+                joinSucceed: true,
+            });
+        });
+    }, []);
+    React.useEffect(() => {
         if (Platform.OS === 'android') {
             requestCameraAndAudioPermission().then(() => {
                 console.log('requested!');
             });
         }
-        init();
+        initAgora();
         return () => {
-            engine.destroy();
+            endCall();
+            engine.removeAllListeners();
+            // engine.destroy();
         };
     }, []);
-    const onUserOffline = (uid: number, reason: any) => {
-        console.log('UserOffline', uid, reason);
-        setAgoraState({
-            ...agoraState,
-            peerIds: peerIds.filter((id) => id !== uid),
-        });
-    };
-    const onUserJoined = (uid: number, elapsed: any) => {
-        console.log('UserOffline', peerIds, uid, elapsed);
-        if (peerIds.indexOf(uid) === -1) {
-            setAgoraState({
-                ...agoraState,
-                peerIds: [...peerIds, uid],
-            });
-        }
-    };
-    const onJoinChannelSuccess = (channel: string, uid: number, elapsed: any) => {
-        console.log('JoinChannelSuccess', channel, uid, elapsed);
-        setAgoraState({
-            ...agoraState,
-            joinSucceed: true,
-        });
-    };
+
     const startCall = async () => {
+        // Join Channel using null token and channel name
         console.log('start agora', agoraState);
-        const res = await engine.joinChannel(agoraState.token, agoraState.channelName, null, 0);
+        const res = await engine?.joinChannel(agoraState.token, agoraState.channelName, null, 0);
     };
     const endCall = async () => {
-        await engine.leaveChannel();
+        console.log('end');
+        await engine?.leaveChannel();
         setAgoraState({ ...agoraState, peerIds: [], joinSucceed: false });
     };
 
     const toggleLocalVideo = async () => {
-        await engine.enableLocalVideo(!enableVideo);
+        // await engine.enableLocalVideo(!enableVideo);
+        await engine.muteLocalVideoStream(enableVideo);
+        // true => false
+        // (await enableVideo) ? engine.disableVideo() : engine.enableVideo();
+
         setOptionsCall({ ...optionsCall, enableVideo: !enableVideo });
     };
     const toggleRemoteAudio = async () => {
@@ -108,6 +141,7 @@ const AgoraView = () => {
         setOptionsCall({ ...optionsCall, muteLocalAudio: !muteLocalAudio });
     };
     const renderVideos = () => {
+        const { joinSucceed } = agoraState;
         return joinSucceed ? (
             <View style={styles.fullView}>
                 <RtcLocalView.SurfaceView
@@ -143,7 +177,8 @@ const AgoraView = () => {
         ) : null;
     };
 
-    const renderRemoteVideos = () => {
+    const renderRemoteVideos = React.useCallback(() => {
+        const { peerIds } = agoraState;
         return (
             <ScrollView
                 style={styles.remoteContainer}
@@ -164,7 +199,7 @@ const AgoraView = () => {
                 })}
             </ScrollView>
         );
-    };
+    }, [agoraState]);
     const switchCamera = () => {
         engine.switchCamera();
     };

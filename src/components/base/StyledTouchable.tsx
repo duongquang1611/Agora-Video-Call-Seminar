@@ -20,7 +20,7 @@ const StyledTouchable: React.FunctionComponent<StyledTouchableProps> = (props: S
 
     return (
         <Pressable
-            accessibilityTraits={'button'}
+            // accessibilityTraits={'button'}
             disabled={disabled}
             android_disableSound={false}
             android_ripple={{ radius: 20 }}

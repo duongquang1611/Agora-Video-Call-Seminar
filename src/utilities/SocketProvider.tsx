@@ -1,16 +1,18 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable no-underscore-dangle */
 import React, { useCallback, useEffect, useState } from 'react';
-import socketIO from 'socket.io-client';
+// import socketIO from 'socket.io-client';
 import Config from 'react-native-config';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Images from 'assets/images';
-import { getMessage } from 'api/modules/api-app/chat';
+// import { getMessage } from 'api/modules/api-app/chat';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { getProfile } from 'api/modules/api-app/authenticate';
 import { logger } from './helper';
 
-export const socket = socketIO(`${Config.API_URL}?role=owner`, { timeout: 3000 });
+// export const socket = socketIO(`${Config.API_URL}?role=owner`, { timeout: 3000 });
+export const socket: any = {};
 export const SocketProvider = ({ children }: any) => {
     const userInfo = useSelector((state: any) => state.userInfo);
     async function handleOnConnect() {
@@ -99,7 +101,7 @@ export const useSocket = (id?: string) => {
                 avatar:
                     listStaff?.find(
                         (staff: any) => Number(`2${staff?.staffId}`) === Number(`${item?.memberType}${item?.memberId}`),
-                    )?.photo?.[0] || Images.icons?.avatar,
+                    )?.photo?.[0] || Images.icons?.tab.home,
                 name:
                     listStaff?.find(
                         (staff: any) => Number(`2${staff?.staffId}`) === Number(`${item?.memberType}${item?.memberId}`),
@@ -114,7 +116,8 @@ export const useSocket = (id?: string) => {
             lastTime: time || new Date().getTime(),
             pageSize: 10,
         };
-        const responseMessage = await getMessage(params);
+        const responseMessage: any = {};
+        // const responseMessage = await getMessage(params);
         const messagesNew = responseMessage?.data?.data.map((item: any) => {
             return formatMessage(item);
         });
@@ -165,7 +168,9 @@ export const useSocket = (id?: string) => {
         });
     };
     const sendMessage = (obj: any) => {
-        socket.emit('client-send-message', obj, (res: any) => {});
+        socket.emit('client-send-message', obj, (res: any) => {
+            console.log('cliend-send-message');
+        });
     };
 
     return { leaveRoom, messages, onSend, getListMessage, setImage };

@@ -1,10 +1,11 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable no-underscore-dangle */
 import React, { useState, useCallback, useEffect } from 'react';
 import { useIsFocused } from '@react-navigation/native';
-import { getMessage } from 'api/modules/api-app/chat';
+// import { getMessage } from 'api/modules/api-app/chat';
 import Images from 'assets/images';
 import { StyledIcon } from 'components/base';
-import ImagePicker from 'components/common/ImagePicker';
+// import ImagePicker from 'components/common/ImagePicker';
 import StyledHeader from 'components/common/StyledHeader';
 import { View, ActivityIndicator, Text } from 'react-native';
 import { GiftedChat, Composer, Send, Bubble } from 'react-native-gifted-chat';
@@ -58,16 +59,16 @@ const ChatScreen = ({ route }: any) => {
     const renderSend = (props: any) => {
         return (
             <Send {...props} containerStyle={{ alignItems: 'center', justifyContent: 'center', marginRight: 5 }}>
-                <StyledIcon source={Images.icons.icSendMess} size={20} />
+                {/* <StyledIcon source={Images.icons.icSendMess} size={20} /> */}
             </Send>
         );
     };
     const renderComposer = (props: any) => {
         return (
             <View style={styles.composer}>
-                <ImagePicker setImage={setImage}>
+                {/* <ImagePicker setImage={setImage}>
                     <StyledIcon customStyle={{ marginLeft: 3 }} source={Images.icons.icPickImage} size={30} />
-                </ImagePicker>
+                </ImagePicker> */}
 
                 <Composer {...props} multiline textInputStyle={styles.input} placeholderTextColor={'#D2D2D2'} />
             </View>
