@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-expressions */
 import Images from 'assets/images';
-import { StyledButton, StyledIcon, StyledInput } from 'components/base';
+import { StyledButton, StyledIcon } from 'components/base';
 import requestCameraAndAudioPermission from 'components/base/Permission';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import RtcEngine, { RtcLocalView, RtcRemoteView, VideoRenderMode } from 'react-native-agora';
 import { SafeAreaView } from 'react-native-safe-area-context';

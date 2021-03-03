@@ -1,19 +1,6 @@
 import * as React from 'react';
-import { Dimensions, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import StyledText from 'components/base/StyledText';
-import { StyledButton, StyledInput } from 'components/base';
-import AuthenticateService from 'utilities/authenticate/AuthenticateService';
-import requestCameraAndAudioPermission from 'components/base/Permission';
-import RtcEngine, {
-    ChannelProfile,
-    ClientRole,
-    RtcLocalView,
-    RtcRemoteView,
-    VideoRenderMode,
-} from 'react-native-agora';
+import { Dimensions, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { onChange } from 'react-native-reanimated';
-import Video from './Video';
 
 const dimensions = {
     width: Dimensions.get('window').width,
