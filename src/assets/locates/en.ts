@@ -6,6 +6,12 @@ export default {
         noData: 'データなし',
         cancel: 'キャンセル',
         confirm: '決定',
+        requireInput: 'Vui lòng nhập đầy đủ thông tin',
+        invalidInput: 'Thông tin không hợp lệ',
+        minLength: 'Vui lòng nhập tối thiểu {{minLength}} ký tự',
+        maxLength: 'Vui lòng nhập tối đa {{maxLength}} ký tự',
+        maxValue: 'Giá trị tối đa là {{max}}',
+        minValue: 'Giá trị tối thiểu là {{min}}',
     },
     modalInput: {
         title: 'hello',

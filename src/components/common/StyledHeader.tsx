@@ -108,18 +108,19 @@ const StyledHeader: React.FunctionComponent<StyledHeaderProps> = (props: StyledH
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: Metrics.safeTopPadding,
+        // paddingTop: Metrics.safeTopPadding,
         paddingHorizontal: 20,
         backgroundColor: Themes.COLORS.primary,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: 110,
+        height: 55,
     },
     defaultHeader: {
         fontWeight: 'bold',
         fontSize: 18,
         color: Themes.COLORS.white,
+        textAlign: 'center',
     },
 });
 

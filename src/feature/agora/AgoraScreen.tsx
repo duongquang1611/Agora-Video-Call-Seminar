@@ -2,10 +2,12 @@
 import Images from 'assets/images';
 import { StyledButton, StyledIcon } from 'components/base';
 import requestCameraAndAudioPermission from 'components/base/Permission';
+import StyledHeader from 'components/common/StyledHeader';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import RtcEngine, { RtcLocalView, RtcRemoteView, VideoRenderMode } from 'react-native-agora';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { isIos } from 'utilities/helper';
 
 const dimensions = {
     width: Dimensions.get('window').width,
@@ -22,7 +24,7 @@ const agoraId = 'd62d96fc554a4972b4c3ed2979470ca6';
 const appSecret = '2e3cd383f35c469189bced13db5d496e';
 const channelName = 'test_100';
 const tempToken =
-    '006d62d96fc554a4972b4c3ed2979470ca6IADPqa1Q7Eb6dzHUAg1mnTztLnAtyJ6FLiM5yKkR43AgRS2MCloAAAAAEAAEa9nrGNNAYAEAAQAY00Bg';
+    '006d62d96fc554a4972b4c3ed2979470ca6IAAbEIQjWkpTSN0u0p7cjY4wHZJRfNl4PhbAkoarYyiV8C2MCloAAAAAEAAEa9nrWshFYAEAAQBZyEVg';
 
 const AgoraView = () => {
     const [agoraState, setAgoraState] = useState<AgoraState>({
@@ -38,7 +40,8 @@ const AgoraView = () => {
         muteLocalAudio: false, // true: Stop sending the local audio stream. muteLocalAudioStream
     });
     const { enableVideo, muteAllRemoteAudio, muteLocalAudio } = optionsCall;
-    const { joinSucceed, peerIds } = agoraState;
+    const { peerIds } = agoraState;
+    const [joinSucceed, setJoinSucceed] = useState(false);
     const init = async () => {
         engine = await RtcEngine.create(agoraId);
         engine.enableVideo();
@@ -53,6 +56,9 @@ const AgoraView = () => {
         engine.addListener('UserJoined', onUserJoined);
     };
     useEffect(() => {
+        console.log(agoraState);
+    }, [agoraState]);
+    useEffect(() => {
         if (Platform.OS === 'android') {
             requestCameraAndAudioPermission().then(() => {
                 console.log('requested!');
@@ -60,6 +66,7 @@ const AgoraView = () => {
         }
         init();
         return () => {
+            engine.removeAllListeners();
             engine.destroy();
         };
     }, []);
@@ -71,7 +78,7 @@ const AgoraView = () => {
         });
     };
     const onUserJoined = (uid: number, elapsed: any) => {
-        console.log('UserOffline', peerIds, uid, elapsed);
+        console.log('UserJoined', peerIds, uid, elapsed);
         if (peerIds.indexOf(uid) === -1) {
             setAgoraState({
                 ...agoraState,
@@ -81,10 +88,7 @@ const AgoraView = () => {
     };
     const onJoinChannelSuccess = (channel: string, uid: number, elapsed: any) => {
         console.log('JoinChannelSuccess', channel, uid, elapsed);
-        setAgoraState({
-            ...agoraState,
-            joinSucceed: true,
-        });
+        setJoinSucceed(true);
     };
     const startCall = async () => {
         console.log('start agora', agoraState);
@@ -92,7 +96,8 @@ const AgoraView = () => {
     };
     const endCall = async () => {
         await engine.leaveChannel();
-        setAgoraState({ ...agoraState, peerIds: [], joinSucceed: false });
+        setAgoraState({ ...agoraState, peerIds: [] });
+        setJoinSucceed(false);
     };
 
     const toggleLocalVideo = async () => {
@@ -114,6 +119,7 @@ const AgoraView = () => {
                     style={styles.max}
                     channelId={agoraState.channelName}
                     renderMode={VideoRenderMode.Hidden}
+                    zOrderMediaOverlay={false}
                 />
                 {renderRemoteVideos()}
                 <View style={styles.optionVideoCall}>
@@ -151,6 +157,7 @@ const AgoraView = () => {
                 horizontal={true}
             >
                 {peerIds.map((value, index, array) => {
+                    console.log('render remote', peerIds);
                     return (
                         <RtcRemoteView.SurfaceView
                             style={styles.remote}
@@ -158,7 +165,7 @@ const AgoraView = () => {
                             uid={value}
                             channelId={agoraState.channelName}
                             renderMode={VideoRenderMode.Hidden}
-                            zOrderMediaOverlay={true}
+                            zOrderMediaOverlay={false}
                         />
                     );
                 })}
@@ -176,14 +183,16 @@ const AgoraView = () => {
         });
     };
     return (
-        <SafeAreaView style={{ flex: 1, alignItems: 'center', marginTop: 10 }}>
-            <ScrollView>
-                <View style={styles.buttonHolder}>
-                    <StyledButton onPress={startCall} title={'Start Call'} />
-                    <StyledButton onPress={switchCamera} title={'Switch Cam'} />
-                    <StyledButton onPress={endCall} title={'End Call'} />
-                </View>
-                {/* <StyledInput
+        <>
+            <StyledHeader title={'Video'} canGoBack={false} />
+            <SafeAreaView style={{ flex: 1, alignItems: 'center', marginTop: 10 }}>
+                <ScrollView>
+                    <View style={styles.buttonHolder}>
+                        <StyledButton onPress={startCall} title={'Start Call'} />
+                        <StyledButton onPress={switchCamera} title={'Switch Cam'} />
+                        <StyledButton onPress={endCall} title={'End Call'} />
+                    </View>
+                    {/* <StyledInput
                     placeholder={'Channel name'}
                     placeholderTextColor={'grey'}
                     defaultValue={agoraState.channelName}
@@ -197,9 +206,10 @@ const AgoraView = () => {
                     customStyle={{ height: 120 }}
                     multiline={true}
                 /> */}
-                {renderVideos()}
-            </ScrollView>
-        </SafeAreaView>
+                    {renderVideos()}
+                </ScrollView>
+            </SafeAreaView>
+        </>
     );
 };
 export default AgoraView;

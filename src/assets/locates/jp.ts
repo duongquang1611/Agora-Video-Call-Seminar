@@ -6,6 +6,8 @@ export default {
         noData: 'データなし',
         cancel: 'キャンセル',
         confirm: '決定',
+        requireInput: 'Vui lòng nhập đầy đủ thông tin',
+        invalidInput: 'Thông tin không hợp lệ',
     },
     modalInput: {
         title: 'hello',

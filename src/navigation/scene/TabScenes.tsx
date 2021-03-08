@@ -18,7 +18,8 @@ import AgoraView from 'feature/agora/AgoraScreen';
 import NotificationScreen from 'feature/notification/NotificationScreen';
 import { View } from 'react-native';
 import { Host } from 'react-native-portalize';
-import AgoraView2 from 'feature/agora2/AgoraScreen2';
+import HookFormView from 'feature/hookForm/HookFormView';
+import HookFormViewCopy from 'feature/hookForm/HookFormViewCopy';
 
 const MainStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -50,8 +51,8 @@ const MainTabContainer = () => {
         },
         {
             name: TAB_NAVIGATION_ROOT.SETTING_ROUTE.ROOT,
-            title: t('tab.setting'),
-            component: SettingView,
+            title: t('Input 2'),
+            component: HookFormViewCopy,
             icon: Images.icons.tab.setting,
         },
         {
@@ -61,16 +62,16 @@ const MainTabContainer = () => {
             icon: Images.icons.tab.setting,
         },
         {
-            name: TAB_NAVIGATION_ROOT.AGORA_ROUTE_2.ROOT,
-            title: t('tab.agora'),
-            component: AgoraView2,
+            name: TAB_NAVIGATION_ROOT.HOOK_FORM.ROOT,
+            title: t('Input'),
+            component: HookFormView,
             icon: Images.icons.tab.setting,
         },
     ];
     return (
         <MainTab.Navigator
             tabBar={(props: BottomTabBarProps) => <StyledTabBar {...props} />}
-            initialRouteName={TAB_NAVIGATION_ROOT.AGORA_ROUTE.ROOT}
+            initialRouteName={TAB_NAVIGATION_ROOT.HOOK_FORM.ROOT}
         >
             {ArrayTabs.map((item, index) => (
                 <MainTab.Screen key={`${index}`} options={{ ...item }} {...item} />
