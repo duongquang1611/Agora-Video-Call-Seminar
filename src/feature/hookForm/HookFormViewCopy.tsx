@@ -27,9 +27,9 @@ const HookFormViewCopy = () => {
     const onSubmit = (formData: any) => {
         console.log(formData);
     };
-    useEffect(() => {
-        trigger();
-    }, []);
+    // useEffect(() => {
+    //     // trigger();
+    // }, []);
     useEffect(() => {
         console.log({ errors: Object.keys(errors) });
     }, [errors]);
@@ -44,7 +44,7 @@ const HookFormViewCopy = () => {
                     <FormInput
                         name={LOGIN_FIELDS.username}
                         label="Username"
-                        rules={{ required: 'Username is required!' }}
+                        rules={{ required: 'Tài khoản không được để trống' }}
                         onSubmitEditing={focusPassword}
                         returnKeyType="next"
                         defaultValue="Test"
@@ -53,9 +53,9 @@ const HookFormViewCopy = () => {
                         name={LOGIN_FIELDS.password}
                         label="Password"
                         rules={{
-                            required: 'Password is required!',
+                            required: 'Mật khẩu không được để trống',
                             minLength: {
-                                message: 'Use at least 10 characters.',
+                                message: 'Độ dài mật khẩu tối thiểu là 10',
                                 value: 10,
                             },
                         }}

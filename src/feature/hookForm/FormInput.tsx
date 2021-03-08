@@ -29,12 +29,18 @@ const ControlledInput = React.forwardRef((props: FormInputProps, forwardedRef: a
         />
     );
 });
+const r = {
+    errors: {
+        test1: { message: 'common.requireInput', ref: [Object], type: 'required' },
+        test2: { message: 'Vui lòng nhập tối thiểu 6 ký tự', ref: [Object], type: 'minLength' },
+    },
+};
 
 export const FormInput = React.forwardRef((props: FormInputProps, forwardedRef) => {
     const { name, ...inputProps } = props;
     const formContext = useFormContext();
     if (!formContext) {
-        const errorMessage = 'Form field must be a descendant of `FormProvider` as it uses `useFormContext`!';
+        const errorMessage = 'Need Wrap Form Input By FormProvider';
         return <Input {...inputProps} error={errorMessage} editable={false} />;
     }
 
